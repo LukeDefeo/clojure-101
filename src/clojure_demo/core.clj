@@ -18,6 +18,8 @@
 
 ; ------------------  fundamental types ------------------
 
+
+
 26                                                          ;java long
 
 26.59                                                       ;java double
@@ -25,6 +27,8 @@
 25M                                                         ; java big decimal
 
 "hello trainline"                                           ;java string
+
+nil                                                         ;similar to null
 
 true false                                                  ;java boolean
 
@@ -45,14 +49,15 @@ true false                                                  ;java boolean
 
 ;symbols
 
+;;symbols are identifiers to your data, you can think of them similar to the mathematical notion of symbols.
+;; e.g x=2  x is a symbol that identifies the value 2,
+
+
 ;;defines a 'global' the symbol foo evaluates to the
 ;;string hello, you can use foo anywhere in this namespace
 (def foo "hello")
 
 (def two-words "world")                                     ;note the convention of - between lower case words
-
-;;symbols are identifiers to your data, you can think of them similar to the mathematical notion of symbols.
-;; e.g x=2  x is a symbol that identifies the value 2,
 
 foo                                                         ;when you send a symbol to the repl it evals to the data
 
@@ -97,10 +102,9 @@ foo                                                         ;when you send a sym
 (fn [input] (* input 2))                                    ;anonymous function
 
 
-((fn [input] (* input 2)) 5)                                ;invoking the fn with arguemnt 5 (dont do this)
-
-
 (def long-way (fn [input] (* input 2)))                     ;binding fn to symbol long-way (dont do this)
+
+(long-way 10)
 
 (defn doubler                                               ;much better, have documentation and easier to read
   "this function doubles the input"
@@ -112,16 +116,17 @@ foo                                                         ;when you send a sym
 
 ;;notice the return value, if is an expression as is everything is clojure
 (if (= 10 (doubler 5))
-  (println "5 * 2 is 10")
-  (println "or is it?"))
+  "5 * 2 is 10"
+  "or is it?")
 
 
 ;if only takes two expressions one for each case, if you want to insert more sideaffects use 'do'
 
 (if (= 10 (doubler 5))
-  (do (println "5 * 2 is 10")
-      (println "doubling 5 makes 10"))
-  (println "or does it?"))
+  (do
+    (println "5 * 2 is 10")
+    "doubling 5 makes 10")
+  "or does it?")
 
 
 (defn fizzbuzz [input]
@@ -148,10 +153,11 @@ foo                                                         ;when you send a sym
 
 ;;nil or false are 'falsey' they failed if conditions
 (if (fizzbuzz2 19)
-  "nothing here")
+  "found"
+  "not here")
 
 ;;everything else is truthy, e.g strings collections etc
-(if (fizzbuzz2 15)
+(when (fizzbuzz2 15)
   "this was true!")
 
 ;;not flips between truthy and falsy
@@ -159,8 +165,12 @@ foo                                                         ;when you send a sym
 (not true)
 (not (not true))
 
-(if (not (fizzbuzz2 19))
+(when (not (fizzbuzz2 19))
   "19 is not fizzed or buzzed")
+
+(when-not (fizzbuzz2 19)
+  "19 is not fizzed or buzzed")
+
 
 ;----------- sequences -----------
 
@@ -181,7 +191,10 @@ foo                                                         ;when you send a sym
 (map doubler my-vector)                                     ;the classic, note if a function takes a single arg
 ; you can just pass directly
 
-(filter (fn [x] (fn [x] (> x 30))) my-vector)
+(filter (fn [x] (> x 30)) my-vector)
+
+;using shorthand syntax
+(filter #(> % 30) my-vector)
 
 (sort > my-vector)
 
@@ -198,13 +211,14 @@ foo                                                         ;when you send a sym
 
 ;...segue to lisp evaluation and macros
 
-(macroexpand-1 '(->> my-vector
-                     (map doubler)
-                     (filter (fn [x] (> x 30)))
-                     (sort >)))
+(macroexpand-1 (quote (->> my-vector
+                          (map doubler)
+                          (filter (fn [x] (> x 30)))
+                          (sort >))))
 
 
 ;many data types in clojure are seq'able
+
 
 (first "hello")                                             ;strings are sequences of charactors
 
@@ -218,19 +232,29 @@ foo                                                         ;when you send a sym
 
 (repeat "clojure")                                          ;this is an infinite sequence of "clojure"
 
+(range)                                                     ;every possible integer (that can fit into memory)
+
+
 ;(count (repeat "clojure"))                                ;dont try this at home
+
 
 (->> (repeat "clojure")
      (take 100)
-     (map (fn [x] (str x " is cool")))
+     (map (fn [x]
+            (Thread/sleep 3000)                             ;fetch from the db
+            (str x " is cool")))
      (first))
 
 
 ;------------------ collections ------------------------
 
-;the collection abstraction implies a fully realised sequence and the
+;the collection abstraction implies a fully realised collection and the
 
-(conj my-vector 100)
+(def my-list (list 11 22 33))
+
+(conj my-list 44)                                           ;my list is still the same
+
+(conj my-vector 44)
 
 (count my-vector)
 
@@ -239,22 +263,22 @@ foo                                                         ;when you send a sym
 ;----------------- maps ----------------
 
 
-(def data-engineers [{:name "Bruno"
+(def data-engineers [{:name           "Bruno"
                       :favouirte-food :pasta
-                      :wear-glasses? true
-                      :pets 2 }
-                     {:name "Sathya"
+                      :wear-glasses?  true
+                      :pets           2}
+                     {:name           "Sathya"
                       :favouirte-food :pizza
-                      :wear-glasses? false
-                      :pets 1}
-                     {:name "Olivier"
+                      :wear-glasses?  false
+                      :pets           1}
+                     {:name           "Olivier"
                       :favouirte-food :chocolate
-                      :wear-glasses? false
-                      :pets 0}
-                     {:name "Luke"
+                      :wear-glasses?  false
+                      :pets           0}
+                     {:name           "Luke"
                       :favouirte-food :olives
-                      :wear-glasses? true
-                      :pets 0}])
+                      :wear-glasses?  true
+                      :pets           0}])
 
 (def bruno (first data-engineers))
 
@@ -263,17 +287,16 @@ foo                                                         ;when you send a sym
 ;;keywords act as functions, can be applied with a map to lookup the value
 (:name bruno)
 
-(bruno :name)                                               ;this can throw null pointer exception
-
-
 (assoc bruno :favouirte-food :tofu)
 
 (def other-bruno (assoc bruno :favouirte-food :tofu))
 
+(clojure.data/diff bruno other-bruno )
+
 (dissoc bruno :name)
 
 (def common-attributes {:favouirte-language :clojure
-                        :location [123123 1241512521]})
+                        :location           [123123 1241512521]})
 
 (merge bruno common-attributes)
 
@@ -281,9 +304,10 @@ foo                                                         ;when you send a sym
        (merge engineer common-attributes)) data-engineers)
 
 
-
 (update bruno :pets inc)
 (update bruno :pets doubler)
+
+
 
 
 ;---------------- sets ---------------
@@ -295,11 +319,12 @@ foo                                                         ;when you send a sym
 (def dynamic-languages #{:clojure :clojure-script :python :javascript})
 
 
-(clojure.set/union functional-languages oo-languages dynamic-languages )
+(clojure.set/union functional-languages oo-languages dynamic-languages)
 
 (clojure.set/intersection functional-languages dynamic-languages)
 
 (clojure.set/difference dynamic-languages functional-languages)
+
 
 
 ; ----------- locals and scope --------------
@@ -311,6 +336,9 @@ foo                                                         ;when you send a sym
 
 (comment
   english-greeting)
+
+(defn multiple? [input divisor]
+  (= (mod input divisor) 0))
 
 (defn multiple2? [input divisor]
   (let [modulus (mod input divisor)]
@@ -334,20 +362,21 @@ foo                                                         ;when you send a sym
 ;; -------------partial application ------------------
 
 
+
 ;;this is 'full' application, you apply a function with all the args and it evals
 ;;to a result
-(re-find #"wally" "wheres wally gone?")                       ;#"" creates a regex
+(re-find #"[Ww]ally" "wheres Wally gone?")                     ;#"" creates a regex
 
 ;;however if you can create a specialised version of a generic function where you
 ;;pre fill some of the arguements, starting from the left
-(def wally-finder (partial re-find #"wally"))
+(def wally-finder (partial re-find #"wally[0-9]"))
 
 ;;this returns a function, its like all other functions, you can call it or pass it around
 (fn? wally-finder)
 
 (wally-finder "wheres wally gone?")
 
-(def books ["wheres wally gone?"
+(def books ["wheres wally1 gone?"
             "trainspotting"
             "wheres wally in las vegas"
             "fear and lothing in las vegas"
@@ -361,13 +390,6 @@ foo                                                         ;when you send a sym
 
 ;----------------- function composition ---------------------------------------
 
-;;functions are highly composable, particularly if  they take 1 arguement, you can compose multiple functions, and the
-;;end result is still a function that takes one arguement and returns one thing
-
-
-;Most clojure librarys expose their behaviour in terms of standard functions, since they are a universal
-;abstraction in the language you can compose functions from completely different places easily
-
 ;business case:
 
 ;1) extract all instances of wally in a string
@@ -375,13 +397,23 @@ foo                                                         ;when you send a sym
 ;3) reverse it
 ;4) profit
 
-(str/reverse (str/upper-case (wally-finder "wheres wally gone")))
+(defn my-composition [arg]
+  (str/reverse (str/upper-case (wally-finder arg))))
 
-(def my-composition (comp str/reverse str/upper-case wally-finder))
+(my-composition " where is wally")
 
-(fn? my-composition)
 
-"wheres wally gone"
+;;functions are highly composable, particularly if  they take 1 arguement, you can compose multiple functions, and the
+;;end result is still a function that takes one arguement and returns one thing
+
+;Most clojure librarys expose their behaviour in terms of standard functions, since they are a universal
+;abstraction in the language you can compose functions from completely different places easily
+
+(def my-comp (comp str/reverse str/upper-case wally-finder))
+
+(fn? my-comp)
+
+(my-comp "where is WALLY")
 
 
 ;; partial application and funciton compositions are tools to enable
@@ -413,11 +445,9 @@ foo                                                         ;when you send a sym
                accumulator))
       accumulator)))
 
-
-
 (fizz-buzzer-loop 100)
 
-(defn fizz-buzzer-reduce [n ]
+(defn fizz-buzzer-reduce [n]
   (reduce (fn [acc x]                                       ;slightly higher level, often usefull,
             (if-let [res (fizzbuzz2 x)]
               (conj acc res)
