@@ -3,6 +3,8 @@
 ;;all clojure files start with a namespace declaration, Take the file path from src root, replace / with . and _ with - remove the clj from the file name
 
 
+; ***** vote for the workshop CRAFT-116  *****
+
 ;;-----------------Introduction -----------
 
 ;;clojure is hosted language. that means it there is code that runs on top of an existing platform (jvm, clr, javascript engine) reads, evaluates and prints your clojure code.
@@ -12,6 +14,7 @@
 ;;We work inside the program when we write code, its its like moulding a something into shape. Its a constant
 ;;interactive process with rapid feedback.If your not sure what something does, evaluate it in your repl!
 
+;
 
 (println "hello world")                                     ;the beginning
 
@@ -20,21 +23,36 @@
 
 
 
-26                                                          ;java long
+26
+;java long
 
-26.59                                                       ;java double
+26.59
+;java double
 
-25M                                                         ; java big decimal
+; java big decimal
+25M
 
-"hello trainline"                                           ;java string
+;java string
+"hello trainline"
 
-nil                                                         ;similar to null
 
-true false                                                  ;java boolean
+;similar to null
+nil
 
-["I am hetrogenious" true "!"]                              ;a vector / array
 
-(list "linked " "list")                                     ;(linked) lists
+;java boolean
+true false
+
+
+;a vector / array
+["I am hetrogenious" true "!"]
+
+
+;(linked) lists
+(list "linked " "list")
+
+'("linked " "list")
+
 
 :name                                                       ;a keyword
 
@@ -49,22 +67,27 @@ true false                                                  ;java boolean
 
 ;symbols
 
+;var x = 2
+(def foo "hello")
+
+foo
+
 ;;symbols are identifiers to your data, you can think of them similar to the mathematical notion of symbols.
+;;they are not storage locations
 ;; e.g x=2  x is a symbol that identifies the value 2,
 
 
 ;;defines a 'global' the symbol foo evaluates to the
 ;;string hello, you can use foo anywhere in this namespace
-(def foo "hello")
+
 
 (def two-words "world")                                     ;note the convention of - between lower case words
 
-foo                                                         ;when you send a symbol to the repl it evals to the data
+                                                         ;when you send a symbol to the repl it evals to the data
 
 ;---------------- values ------------------
 
-;;clojure emphasises values over references, equality is based on the content rather than which specfic object
-;;you have
+;;clojure emphasises values over references, equality is based on the content rather than which specfic object you have
 
 (def person1 {:name "Luke"
               :age  26})
@@ -74,11 +97,13 @@ foo                                                         ;when you send a sym
 
 
 
+
+
+
 (identical? person1 person2)                                ;very rarely usefull but just to demonstrate
 
 
 (= person1 person2)
-
 
 ;;values are immutable, they do not change, you cannot change the value of the number 42 to -5. We are already
 ;;familar with this as all c based languages treat numbers as values, clojure extends this concept to all data types
@@ -93,20 +118,23 @@ foo                                                         ;when you send a sym
 
 ;;e.g the count function returns the number of items in a collection
 
-(count ["clojure" "is" "cool"])                             ;invoking a function in the core
+;invoking a function in the core
+(count ["clojure" "is" "cool"])
 
-(str/upper-case "make it shouty")                           ;invoking a function in an aliased namespace
+;invoking a function in an aliased namespace
+(str/upper-case "make it shouty")
 
 ;; to create an anonymous function
+(fn [input]
+  (* input 2))
 
-(fn [input] (* input 2))                                    ;anonymous function
-
-
-(def long-way (fn [input] (* input 2)))                     ;binding fn to symbol long-way (dont do this)
+;binding fn to symbol long-way (dont do this)
+(def long-way (fn [input] (* input 2)))
 
 (long-way 10)
 
-(defn doubler                                               ;much better, have documentation and easier to read
+;much better, have documentation and easier to read
+(defn doubler
   "this function doubles the input"
   [input]
   (* input 2))
@@ -114,8 +142,12 @@ foo                                                         ;when you send a sym
 
 ;---------------- control flow -------
 
+
+(println "hello world")
+
 ;;notice the return value, if is an expression as is everything is clojure
-(if (= 10 (doubler 5))
+(if (= 9 (doubler 5))
+  (println "calling db")
   "5 * 2 is 10"
   "or is it?")
 
@@ -128,6 +160,12 @@ foo                                                         ;when you send a sym
     "doubling 5 makes 10")
   "or does it?")
 
+
+;3 fizz
+
+;10 buzz
+
+;15 fizzbuzz
 
 (defn fizzbuzz [input]
   (cond
@@ -180,16 +218,17 @@ foo                                                         ;when you send a sym
 
 (first ["1" "2"])
 
-(cons "hello" ["world"])
+(cons "120 Holborn" ["London" "EC1N 2TD"])
 
-(rest ["hello" "world"])
+(rest ["hello" "world" "!"])
 
 ;on top of these basic functions there is exists a standard library of functions for manipulating seqs
 
 (def my-vector [11 22 33])
 
-(map doubler my-vector)                                     ;the classic, note if a function takes a single arg
-; you can just pass directly
+;if a function takes a single arg
+;you can just pass directly
+(map doubler my-vector)
 
 (filter (fn [x] (> x 30)) my-vector)
 
@@ -205,8 +244,9 @@ foo                                                         ;when you send a sym
 ;as they are designed to be used with this macro functions return a seq and this you to compose your operations
 
 (->> my-vector
-     (map doubler)
-     (filter (fn [x] (> x 30)))
+     (map doubler )
+     (filter (fn [x]
+               (> x 30)))
      (sort >))
 
 ;...segue to lisp evaluation and macros
@@ -239,14 +279,11 @@ foo                                                         ;when you send a sym
 
 
 (->> (repeat "clojure")
-     (take 100)
-     (map (fn [x]
-            (Thread/sleep 3000)                             ;fetch from the db
-            (str x " is cool")))
-     (first))
+     (take 1)
+     (take 100))
 
 
-;------------------ collections ------------------------
+;------------------ collections ----------------------
 
 ;the collection abstraction implies a fully realised collection and the
 
@@ -256,27 +293,27 @@ foo                                                         ;when you send a sym
 
 (conj my-vector 44)
 
+
 (count my-vector)
 
 (empty? [])
 
 ;----------------- maps ----------------
 
-
 (def data-engineers [{:name           "Bruno"
-                      :favouirte-food :pasta
+                      :favourite-food :pasta
                       :wear-glasses?  true
                       :pets           2}
                      {:name           "Sathya"
-                      :favouirte-food :pizza
+                      :favourite-food :pizza
                       :wear-glasses?  false
                       :pets           1}
                      {:name           "Olivier"
-                      :favouirte-food :chocolate
+                      :favourite-food :chocolate
                       :wear-glasses?  false
                       :pets           0}
                      {:name           "Luke"
-                      :favouirte-food :olives
+                      :favourite-food :olives
                       :wear-glasses?  true
                       :pets           0}])
 
@@ -287,15 +324,19 @@ foo                                                         ;when you send a sym
 ;;keywords act as functions, can be applied with a map to lookup the value
 (:name bruno)
 
-(assoc bruno :favouirte-food :tofu)
+(def input "foo")
 
-(def other-bruno (assoc bruno :favouirte-food :tofu))
+
+(assoc bruno :favourite-food "Tofu")
+
+(def other-bruno (assoc bruno :favourite-food :tofu))
 
 (clojure.data/diff bruno other-bruno )
 
 (dissoc bruno :name)
 
-(def common-attributes {:favouirte-language :clojure
+(def common-attributes {
+                        :favourite-language :clojure
                         :location           [123123 1241512521]})
 
 (merge bruno common-attributes)
@@ -303,10 +344,9 @@ foo                                                         ;when you send a sym
 (map (fn [engineer]
        (merge engineer common-attributes)) data-engineers)
 
-
-(update bruno :pets inc)
+(inc 1)
+(update bruno :pets (fn [x] (inc x)))
 (update bruno :pets doubler)
-
 
 
 
@@ -332,10 +372,12 @@ foo                                                         ;when you send a sym
 ;symbols defined in let block are only available in the scope of the let block's scope
 (let [english-greeting "hello"
       french-greeting "bonjour"]
+  (println "hello")
   (str english-greeting french-greeting))
 
+english-greeting
 (comment
-  english-greeting)
+  )
 
 (defn multiple? [input divisor]
   (= (mod input divisor) 0))
@@ -359,31 +401,32 @@ foo                                                         ;when you send a sym
 (apply str args)
 
 
-;; -------------partial application ------------------
-
+;; -------------partial application-----------------
 
 
 ;;this is 'full' application, you apply a function with all the args and it evals
 ;;to a result
-(re-find #"[Ww]ally" "wheres Wally gone?")                     ;#"" creates a regex
+(re-find #"[Ww]ally" "wheres Wally gone?")
+;#"" creates a regex
 
 ;;however if you can create a specialised version of a generic function where you
 ;;pre fill some of the arguements, starting from the left
-(def wally-finder (partial re-find #"wally[0-9]"))
+(def wally-finder (partial re-find #"[Ww]ally"))
 
 ;;this returns a function, its like all other functions, you can call it or pass it around
 (fn? wally-finder)
 
 (wally-finder "wheres wally gone?")
 
-(def books ["wheres wally1 gone?"
+(def books ["wheres wally gone?"
             "trainspotting"
-            "wheres wally in las vegas"
+            "wheres wally in hollywood"
             "fear and lothing in las vegas"
             "php for dummies"])
 
 
-(filter (fn [text] (re-find #"wally" text)) books)
+(filter (fn [text]
+          (re-find #"[Ww]ally" text)) books)
 
 (filter wally-finder books)
 
@@ -413,7 +456,7 @@ foo                                                         ;when you send a sym
 
 (fn? my-comp)
 
-(my-comp "where is WALLY")
+(my-comp "where is Wally")
 
 
 ;; partial application and funciton compositions are tools to enable
@@ -432,7 +475,7 @@ foo                                                         ;when you send a sym
                        accumulator))
     accumulator))
 
-(fizz-buzzer-rec (range 100) [])
+(fizz-buzzer-rec (range 1000) [])
 
 ;;performs tail call optimisation
 (defn fizz-buzzer-loop [n]
@@ -445,7 +488,7 @@ foo                                                         ;when you send a sym
                accumulator))
       accumulator)))
 
-(fizz-buzzer-loop 100)
+(fizz-buzzer-loop 1000000)
 
 (defn fizz-buzzer-reduce [n]
   (reduce (fn [acc x]                                       ;slightly higher level, often usefull,
@@ -463,8 +506,8 @@ foo                                                         ;when you send a sym
 (fizz-buzzer-seq 10)
 
 
+;------------ Questions ? --------------;
 
-; ---------- pop quiz -------------
 
 
 
@@ -473,3 +516,7 @@ foo                                                         ;when you send a sym
 ; clojure for brave and true http://www.braveclojure.com/foreword/
 ; persistent data structures http://hypirion.com/musings/understanding-persistent-vector-pt-1
 ; destructuring http://blog.brunobonacci.com/2014/11/16/clojure-complete-guide-to-destructuring/
+
+
+
+
